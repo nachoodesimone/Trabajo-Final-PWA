@@ -425,7 +425,7 @@ export const HomeScreen = () => {
                                     <button className="btn-action-icon" onClick={() => setShowEditModal(true)}>
                                         ✏️ Editar
                                     </button>
-                                    <button className="btn-action-icon btn-delete-workspace" onClick={handleDeleteWorkspace}>
+                                    <button className="btn-action-icon btn-delete-workspace" onClick={handleDeleteClick}>
                                         🗑️ Eliminar
                                     </button>
                                 </div>

@@ -35,10 +35,48 @@ class AuthService {
         await mailer_transport.sendMail({
             to: email,
             from: ENVIRONMENT.GMAIL_USERNAME,
-            subject: "Verifica tu mail",
+            subject: "Verifica tu dirección de correo electrónico",
             html: `
-                <h1>Bienvenido a SLACK</h1>
-                <a href='${ENVIRONMENT.URL_BACKEND}/api/auth/verify-email?verification_token=${verification_token}'>Click aqui</a> para verificar tu cuenta
+                <div style="background-color: #f8f9fa; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; min-height: 100%;">
+                    <div style="max-width: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; border: 1px solid #e1e4e8; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                        <!-- Header / Logo -->
+                        <div style="background-color: #4a154b; padding: 25px; text-align: center;">
+                            <span style="font-size: 24px; font-weight: 900; color: #ffffff; letter-spacing: -0.5px;">
+                                slack<span style="color: #36c5f0;">.</span>utn
+                            </span>
+                        </div>
+                        <!-- Content -->
+                        <div style="padding: 30px 25px; text-align: center;">
+                            <h1 style="font-size: 22px; color: #1d1c1d; margin-top: 0; margin-bottom: 15px; font-weight: 700;">¡Hola, ${name}! 👋</h1>
+                            <p style="font-size: 15px; color: #4a154b; line-height: 1.5; margin-bottom: 25px;">
+                                ¡Te damos la bienvenida a <b>Slack UTN</b>! Para completar tu registro y comenzar a colaborar con tu equipo, por favor verifica tu dirección de correo electrónico.
+                            </p>
+                            
+                            <!-- CTA Button -->
+                            <div style="margin: 30px 0;">
+                                <a href="${ENVIRONMENT.URL_BACKEND}/api/auth/verify-email?verification_token=${verification_token}" 
+                                   style="background-color: #4a154b; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 3px 6px rgba(74,21,75,0.2);">
+                                   Verificar cuenta
+                                </a>
+                            </div>
+                            
+                            <p style="font-size: 14px; color: #616061; line-height: 1.5; margin-top: 25px; border-top: 1px solid #f1f1f2; padding-top: 20px;">
+                                Si el botón no funciona, copia y pega el siguiente enlace en tu navegador:
+                            </p>
+                            <p style="font-size: 12px; color: #1264a3; word-break: break-all; margin: 10px 0;">
+                                <a href="${ENVIRONMENT.URL_BACKEND}/api/auth/verify-email?verification_token=${verification_token}" style="color: #1264a3; text-decoration: none;">
+                                    ${ENVIRONMENT.URL_BACKEND}/api/auth/verify-email?verification_token=${verification_token}
+                                </a>
+                            </p>
+                        </div>
+                        <!-- Footer -->
+                        <div style="background-color: #f8f9fa; padding: 20px; text-align: center; border-top: 1px solid #e1e4e8;">
+                            <p style="font-size: 11px; color: #616061; margin: 0;">
+                                Este correo fue enviado automáticamente por Slack UTN. Por favor no respondas a este mensaje.
+                            </p>
+                        </div>
+                    </div>
+                </div>
             `
         });
 
