@@ -1,0 +1,529 @@
+{
+	"info": {
+		"_postman_id": "a9a3b6ef-9a5c-43f1-b924-c155554f67c2",
+		"name": "Slack UTN - Proyecto Final",
+		"description": "Colección de Postman para testear la API REST de Slack UTN. Incluye autenticación, flujo de verificación, restauración de contraseña, CRUD de espacios de trabajo y flujo formal de invitaciones.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Autenticación",
+			"item": [
+				{
+					"name": "Registrar Usuario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Usuario Prueba\",\n    \"email\": \"prueba@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Registra un nuevo usuario en el sistema. Se envía automáticamente un correo de verificación SMTP con el token de activación."
+					},
+					"response": []
+				},
+				{
+					"name": "Verificar Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/auth/verify-email?verification_token={{verification_token}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"verify-email"
+							],
+							"query": [
+								{
+									"key": "verification_token",
+									"value": "{{verification_token}}",
+									"description": "Token JWT enviado al correo del usuario."
+								}
+							]
+						},
+						"description": "Activa la cuenta del usuario cambiando 'email_verificado' a true. El token se obtiene del enlace enviado al correo electrónico."
+					},
+					"response": []
+				},
+				{
+					"name": "Iniciar Sesión",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"prueba@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Autentica al usuario y retorna un access_token JWT que expira en 24 horas. La cuenta debe estar verificada previamente."
+					},
+					"response": []
+				},
+				{
+					"name": "Solicitar Restaurar Contraseña",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"prueba@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/reset-password-request",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"reset-password-request"
+							]
+						},
+						"description": "Solicita un correo electrónico SMTP para reestablecer la contraseña si el email está registrado en el sistema."
+					},
+					"response": []
+				},
+				{
+					"name": "Confirmar Nueva Contraseña",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{reset_token}}",
+								"description": "Token de recuperación JWT provisto por email"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"newPassword\": \"nueva_password_segura\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/reset-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"reset-password"
+							]
+						},
+						"description": "Reestablece la contraseña del usuario utilizando el token JWT firmado con una clave temporal (secreto + contraseña actual)."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2. Espacios de Trabajo",
+			"item": [
+				{
+					"name": "Crear Workspace",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Workspace UTN\",\n    \"descripcion\": \"Espacio para programar en PWA\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/workspace",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workspace"
+							]
+						},
+						"description": "Crea un espacio de trabajo y genera la membresía del creador automáticamente con rol 'dueño' y estado 'ACEPTADO'."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Workspaces del Usuario",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/workspace",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workspace"
+							]
+						},
+						"description": "Obtiene la lista de todos los espacios de trabajo a los que pertenece el usuario autenticado (con estatus 'ACEPTADO')."
+					},
+					"response": []
+				},
+				{
+					"name": "Ver Detalle de Workspace",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/workspace/{{workspace_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workspace",
+								"{{workspace_id}}"
+							]
+						},
+						"description": "Retorna información de detalle del espacio de trabajo indicado. El usuario autenticado debe ser miembro activo."
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Workspace",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Nombre Modificado\",\n    \"descripcion\": \"Nueva descripción del espacio\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/workspace/{{workspace_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workspace",
+								"{{workspace_id}}"
+							]
+						},
+						"description": "Permite modificar el nombre y/o descripción del espacio de trabajo. Requiere rol 'dueño' (owner) o 'admin' del workspace."
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Workspace (Lógico)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/workspace/{{workspace_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workspace",
+								"{{workspace_id}}"
+							]
+						},
+						"description": "Realiza la baja lógica del workspace cambiando su estado a false. Requiere rol exclusivo de 'dueño'."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3. Miembros del Workspace",
+			"item": [
+				{
+					"name": "Invitar Miembro",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"colaborador@example.com\",\n    \"role\": \"usuario\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/workspace/{{workspace_id}}/members",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workspace",
+								"{{workspace_id}}",
+								"members"
+							]
+						},
+						"description": "Envía una invitación por correo a un usuario para unirse. Requiere rol 'dueño' o 'admin' del workspace. Se crea membresía en estado 'PENDIENTE'."
+					},
+					"response": []
+				},
+				{
+					"name": "Procesar Decisión de Invitación",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/workspace/{{workspace_id}}/members/ACEPTADO?invitation_token={{invitation_token}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workspace",
+								"{{workspace_id}}",
+								"members",
+								"ACEPTADO"
+							],
+							"query": [
+								{
+									"key": "invitation_token",
+									"value": "{{invitation_token}}",
+									"description": "Token JWT de invitación enviado al email"
+								}
+							]
+						},
+						"description": "Acepta (ACEPTADO) o rechaza (RECHAZADO) la invitación del workspace activo, actualizando el estado de la membresía."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar Miembros",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/workspace/{{workspace_id}}/members",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workspace",
+								"{{workspace_id}}",
+								"members"
+							]
+						},
+						"description": "Retorna todos los miembros con estado activo ('ACEPTADO') del workspace indicado. Debe ser miembro del workspace."
+					},
+					"response": []
+				},
+				{
+					"name": "Cambiar Rol de Miembro",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rol\": \"admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/workspace/{{workspace_id}}/members/{{member_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workspace",
+								"{{workspace_id}}",
+								"members",
+								"{{member_id}}"
+							]
+						},
+						"description": "Modifica el rol de un miembro ('admin' | 'usuario' | 'dueño'). Requiere rol exclusivo de 'dueño' (owner). Si se promueve a dueño, el dueño anterior es degradado a admin."
+					},
+					"response": []
+				},
+				{
+					"name": "Remover Miembro / Abandonar",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/workspace/{{workspace_id}}/members/{{member_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"workspace",
+								"{{workspace_id}}",
+								"members",
+								"{{member_id}}"
+							]
+						},
+						"description": "Remueve a un miembro (requiere rol de dueño/admin) o permite que el usuario autenticado abandone el workspace."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4. Perfil",
+			"item": [
+				{
+					"name": "Obtener Perfil",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"profile"
+							]
+						},
+						"description": "Retorna información del perfil del usuario autenticado si provee un token JWT válido."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:4000",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "verification_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "reset_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "workspace_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "member_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "invitation_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
